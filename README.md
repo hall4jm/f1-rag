@@ -45,42 +45,33 @@ The first version of this project did pure RAG and got **hit@k = 0.36** on the g
 
 ```mermaid
 flowchart LR
-    subgraph build["Offline: index build"]
-        WIKI[Wikipedia<br/>F1 articles<br/>2018–2025]
-        SCRAPE[scrape.py<br/>~190 JSON files]
-        CHUNK[chunk.py<br/>~1,250 chunks]
-        EMBED[embed.py<br/>BGE-small-en-v1.5]
-        CHROMA[(ChromaDB<br/>persistent)]
-        WIKI --> SCRAPE --> CHUNK --> EMBED --> CHROMA
+    subgraph index_build [Index build - offline]
+        WIKI[Wikipedia<br>2018-2025] --> SCRAPE[scrape.py]
+        SCRAPE --> CHUNK[chunk.py]
+        CHUNK --> EMBED[embed.py<br>BGE-small-en-v1.5]
+        EMBED --> CHROMA[(ChromaDB)]
     end
 
-    subgraph query["Online: query time"]
-        Q[User question]
-        RETRIEVE[retrieve.py<br/>top-k chunks]
-        PIPE{pipeline.py}
-        GEN1[generate.py<br/>Llama 3.3 70B via Groq]
-        GEN2[generate_with_tools<br/>same model + tool defs]
-        TOOLS[tools.py<br/>6 tool fns]
-        JOLPICA[Jolpica F1 API]
-        ANS[Answer + citations]
-
-        Q --> RETRIEVE
-        CHROMA -.cosine.-> RETRIEVE
-        RETRIEVE --> PIPE
-        PIPE -->|v1: pure RAG| GEN1 --> ANS
-        PIPE -->|v2: agentic| GEN2
-        GEN2 <--> TOOLS
-        TOOLS <--> JOLPICA
+    subgraph query_time [Query time - online]
+        Q[User question] --> RETRIEVE[retrieve.py]
+        RETRIEVE --> PIPE{pipeline.py}
+        PIPE -->|v1 pure RAG| GEN1[generate.py]
+        PIPE -->|v2 agentic| GEN2[generate_with_tools]
+        GEN2 --> TOOLS[tools.py]
+        TOOLS --> JOLPICA[Jolpica F1 API]
+        JOLPICA --> GEN2
+        GEN1 --> ANS[Answer + citations]
         GEN2 --> ANS
     end
 
-    subgraph eval["Offline: eval"]
-        GOLD[evals/questions.yaml]
-        EVALH[evaluate.py<br/>hit@k, MRR, Ragas]
-        REPORT[v1 vs v2 report]
-        GOLD --> EVALH --> REPORT
-        ANS -.-> EVALH
+    CHROMA --> RETRIEVE
+
+    subgraph eval_run [Eval - offline]
+        GOLD[evals/questions.yaml] --> EVALH[evaluate.py]
+        EVALH --> REPORT[v1 vs v2 report]
     end
+
+    ANS --> EVALH
 ```
 
 ---
