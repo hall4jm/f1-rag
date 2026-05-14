@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "f1-rag"
+version = "0.1.0"
+description = "Hybrid RAG chatbot for Formula 1 race history and strategy."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "f1-rag author" }]
+
+dependencies = [
+    "pydantic>=2.5",
+    "pydantic-settings>=2.1",
+    "chromadb>=0.5",
+    "sentence-transformers>=3.0",
+    "openai>=1.50",
+    "anthropic>=0.40",
+    "ollama>=0.3",
+    "requests>=2.31",
+    "wikipedia-api>=0.6",
+    "tenacity>=8.2",
+    "tqdm>=4.66",
+    "tiktoken>=0.7",
+]
+
+[project.optional-dependencies]
+ui = ["streamlit>=1.36"]
+
+[dependency-groups]
+eval = [
+    "ragas>=0.2",
+    "datasets>=2.20",
+    "langchain-openai>=0.2",
+    "langchain-huggingface>=0.1",
+    "pyyaml>=6",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/f1_rag"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "N",   # pep8-naming
+]
+ignore = ["E501"]  # line length is handled by the formatter
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B011"]  # allow `assert False` in tests
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"

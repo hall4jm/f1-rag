@@ -1,0 +1,200 @@
+# Gold Q&A set for the Ragas eval harness.
+#
+# Schema (per item):
+#   id:               short identifier (F1, S2, C3, M1, O2, ...)
+#   category:         one of: factual | strategy | comparison | multi_race | out_of_scope
+#   question:         user-facing question
+#   gold_answer:      canonical answer. Use literal "TODO" if uncertain; the harness skips
+#                     those rather than score against bad gold. For out_of_scope, the
+#                     gold_answer describes the EXPECTED refusal behaviour -- the harness
+#                     uses a phrase check, not a literal match.
+#   gold_source_urls: Wikipedia URLs that should appear in the top-k retrieved chunks.
+#                     URLs are compared URL-decoded + lowercased, so the encoded form
+#                     (2022_S%C3%A3o_Paulo_Grand_Prix) matches the human form.
+#                     Empty list for out_of_scope.
+#   notes:            free text -- what this question probes, edge cases, uncertainty.
+
+questions:
+  # ========== FACTUAL LOOKUPS ==========
+  - id: F1
+    category: factual
+    question: "Who won the 2022 Hungarian Grand Prix, and from what grid position did he start?"
+    gold_answer: |-
+      Max Verstappen won the 2022 Hungarian Grand Prix, starting from 10th on the grid
+      after a Q3 issue limited him in qualifying.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Hungarian_Grand_Prix
+    notes: |-
+      Validated by the phase 3 retrieval smoke test. A changeable-weather race in which
+      Verstappen also recovered from a 360-degree spin mid-race.
+
+  - id: F2
+    category: factual
+    question: "Who took pole position at the 2022 Hungarian Grand Prix?"
+    gold_answer: |-
+      George Russell took pole position -- his first Formula One pole.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Hungarian_Grand_Prix
+    notes: Maiden pole for Russell in changeable qualifying conditions.
+
+  - id: F3
+    category: factual
+    question: "What was Sebastian Vettel's final season as a full-time F1 driver?"
+    gold_answer: |-
+      2022. Vettel retired at the end of the 2022 season after driving for Aston Martin;
+      his final race was the 2022 Abu Dhabi Grand Prix.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Formula_One_World_Championship
+      - https://en.wikipedia.org/wiki/2022_Abu_Dhabi_Grand_Prix
+    notes: Vettel announced retirement mid-2022.
+
+  # ========== STRATEGY / NARRATIVE ==========
+  - id: S1
+    category: strategy
+    question: "Why was Ferrari's tyre strategy at the 2022 Hungarian Grand Prix widely criticised?"
+    gold_answer: |-
+      Ferrari switched Charles Leclerc onto the hard tyre compound after he had been leading
+      on mediums. The hards struggled to come up to temperature in the cool conditions and
+      Leclerc lost significant pace, dropping multiple positions. Pundits criticised the call
+      publicly -- Alex Brundle said the hards made "no sense" and Alex Mitton called the
+      Ferrari strategy team the "worst".
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Hungarian_Grand_Prix
+    notes: |-
+      The phase 3 retrieval smoke test confirmed the exact paragraph quoting Brundle and
+      Mitton sits at top-1 for queries about this controversy.
+
+  - id: S2
+    category: strategy
+    question: "What was 'porpoising' in the 2022 F1 season, and why was it a problem?"
+    gold_answer: |-
+      Porpoising was a violent vertical bouncing of the 2022 ground-effect cars on straights.
+      The underfloor airflow stalled at high speed, the car lost downforce and rose, then
+      regained downforce and slammed back down -- repeating rapidly. It caused driver
+      discomfort and back pain, raised safety concerns, and led the FIA to issue technical
+      directives mid-season allowing teams to adjust floor stiffness and minimum ride height.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Formula_One_World_Championship
+      - https://en.wikipedia.org/wiki/2022_Bahrain_Grand_Prix
+      - https://en.wikipedia.org/wiki/2022_Emilia_Romagna_Grand_Prix
+    notes: Multi-source synthesis. Tests whether retrieval pulls from both season and race articles.
+
+  - id: S3
+    category: strategy
+    question: "What controversy surrounded the end of the 2021 Abu Dhabi Grand Prix?"
+    gold_answer: |-
+      After a late-race safety car following a Nicholas Latifi crash, race director Michael
+      Masi allowed only the five lapped cars between Hamilton and Verstappen to un-lap
+      themselves (rather than all lapped cars, per the usual procedure), then restarted the
+      race for a one-lap finish. Verstappen, on fresh soft tyres, overtook Hamilton (on worn
+      hards) to win the race and the Drivers' Championship. Mercedes protested unsuccessfully.
+      The decision was widely criticised, and Masi was removed from the race-director role
+      for 2022.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2021_Abu_Dhabi_Grand_Prix
+    notes: One of the most well-documented controversies in modern F1.
+
+  # ========== COMPARISON ==========
+  - id: C1
+    category: comparison
+    question: "How did Ferrari and Mercedes compare in the 2022 Constructors' Championship?"
+    gold_answer: |-
+      Ferrari finished second and Mercedes finished third. Red Bull Racing won the
+      championship by a comfortable margin over both.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Formula_One_World_Championship
+    notes: Tests retrieval against the season-summary article.
+
+  - id: C2
+    category: comparison
+    question: "How close were Max Verstappen and Lewis Hamilton in the 2021 Drivers' Championship?"
+    gold_answer: |-
+      They entered the final race of the season -- the 2021 Abu Dhabi Grand Prix -- tied on
+      points (369.5 each), with Verstappen ahead on countback due to more race wins.
+      Verstappen overtook Hamilton on the final lap of the final race to win the championship
+      by 8 points.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2021_Formula_One_World_Championship
+      - https://en.wikipedia.org/wiki/2021_Abu_Dhabi_Grand_Prix
+    notes: Cross-document synthesis between the season summary and the final race.
+
+  - id: C3
+    category: comparison
+    question: "How did Mercedes' performance change between the 2021 and 2022 F1 seasons?"
+    gold_answer: |-
+      In 2021 Mercedes were the dominant team -- they won the Constructors' Championship and
+      Hamilton fought for the Drivers' title until the final lap of the season. In 2022,
+      under the new ground-effect regulations, Mercedes struggled significantly: they suffered
+      badly from porpoising, took no race wins until George Russell won the 2022 São Paulo
+      Grand Prix late in the season, and finished third in the Constructors' Championship.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2021_Formula_One_World_Championship
+      - https://en.wikipedia.org/wiki/2022_Formula_One_World_Championship
+      - https://en.wikipedia.org/wiki/2022_S%C3%A3o_Paulo_Grand_Prix
+    notes: |-
+      Cross-season comparison. Note the encoded URL for São Paulo (%C3%A3 = ã) -- the harness
+      URL-decodes both sides before comparing.
+
+  # ========== MULTI-RACE PATTERNS ==========
+  - id: M1
+    category: multi_race
+    question: "What were the main technical regulation changes for the 2022 F1 season?"
+    gold_answer: |-
+      The biggest regulation change in a generation: a switch to ground-effect aerodynamics
+      (Venturi tunnels under the car), simpler over-body and wing geometry designed to reduce
+      wake turbulence and enable closer racing, 18-inch wheels (up from 13-inch), and a
+      stricter cost cap. The stated aims were closer racing and reduced costs. An unintended
+      consequence was porpoising.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2022_Formula_One_World_Championship
+    notes: Related to S2 (porpoising as an unintended consequence).
+
+  - id: M2
+    category: multi_race
+    question: "How many race wins did Max Verstappen achieve in the 2023 F1 season?"
+    gold_answer: |-
+      19 wins from 22 races -- the highest single-season win count in Formula One history.
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2023_Formula_One_World_Championship
+    notes: Verify 19/22 against the season article -- widely reported but worth confirming.
+
+  - id: M3
+    category: multi_race
+    question: "Which races were cancelled from the 2020 F1 calendar due to the COVID-19 pandemic?"
+    gold_answer: TODO
+    gold_source_urls:
+      - https://en.wikipedia.org/wiki/2020_Formula_One_World_Championship
+    notes: |-
+      I know the Australian, Monaco, Dutch, French, Azerbaijan, Singapore, Japanese, US,
+      Mexican, Brazilian, and Canadian Grands Prix were cancelled, but I'm not confident
+      of the *complete* list -- please verify before filling in.
+
+  # ========== OUT-OF-SCOPE (refusal expected) ==========
+  - id: O1
+    category: out_of_scope
+    question: "Who won the 2010 Monaco Grand Prix?"
+    gold_answer: |-
+      REFUSAL EXPECTED. Corpus covers 2018-2025 only; the system should refuse rather than
+      answer from training data. (For human reference: Mark Webber won the 2010 Monaco GP --
+      but this is outside scope and should not appear in the model's answer.)
+    gold_source_urls: []
+    notes: |-
+      The classic "answers from training data" failure mode. Verified to refuse correctly in
+      the phase 4 sanity check.
+
+  - id: O2
+    category: out_of_scope
+    question: "Who is the reigning F1 World Drivers' Champion in 2027?"
+    gold_answer: |-
+      REFUSAL EXPECTED. The 2027 season hasn't happened yet and the corpus ends at 2025.
+    gold_source_urls: []
+    notes: Tests refusal on questions about the future.
+
+  - id: O3
+    category: out_of_scope
+    question: "What is Charles Leclerc's favourite food?"
+    gold_answer: |-
+      REFUSAL EXPECTED. This information is not in the F1 race / season corpus -- the model
+      should refuse rather than speculate from training data.
+    gold_source_urls: []
+    notes: Tests refusal on questions outside the corpus topic (race results / technical).

@@ -1,0 +1,17 @@
+# Streamlit Community Cloud deploy dependencies.
+#
+# Local development uses pyproject.toml + uv (run `uv sync --extra ui --group dev`).
+# This file is the explicit deploy pin -- it's what Streamlit Cloud installs.
+# Kept lean: omits build-time deps (wikipedia-api, tiktoken) and alt-provider
+# SDKs (anthropic, ollama) that the cloud deploy never invokes when running
+# against Groq.
+
+pydantic>=2.5
+pydantic-settings>=2.1
+chromadb>=0.5
+sentence-transformers>=3.0
+openai>=1.50
+requests>=2.31
+tenacity>=8.2
+tqdm>=4.66
+streamlit>=1.36

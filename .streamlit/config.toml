@@ -1,0 +1,23 @@
+# Streamlit theme. Dark base with F1 brand red (#E10600) as the primary accent.
+# Streamlit Cloud applies this automatically; locally it's picked up by
+# `streamlit run` from the project root.
+
+[theme]
+base = "dark"
+primaryColor = "#E10600"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#161A23"
+textColor = "#FAFAFA"
+font = "sans serif"
+
+[server]
+# Default headless on; harmless for local and required for some hosted contexts.
+headless = true
+# Polling avoids the noisy `transformers` __path__ introspection that the default
+# "auto" watcher triggers (it tries to lazy-import image-processing modules that
+# need torchvision, which we don't install). Hot reload still works, just by
+# stat()ing files instead of poking modules.
+fileWatcherType = "poll"
+
+[browser]
+gatherUsageStats = false

@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# Data and indices
+# data/raw/ and data/processed/ are not committed -- the corpus is rebuildable
+# from scrape.py. chroma_db/, by contrast, IS committed: Streamlit Cloud needs
+# the prebuilt index in the repo to avoid a ~10-minute first-boot rebuild.
+data/raw/*
+data/processed/*
+data/jolpica_cache/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Eval results (run-time artifacts, not source)
+evals/results/
+
+# Hugging Face model cache (sentence-transformers downloads land here)
+.cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
