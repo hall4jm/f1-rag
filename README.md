@@ -130,20 +130,6 @@ Three representative failures, with hypotheses:
 
 ---
 
-## What I'd do next
-
-In rough order of impact:
-
-- **Cross-encoder re-ranker** for retrieval. Retrieve top-20 with BGE, re-score with a stronger encoder, keep top-5. Closes most of the remaining MRR gap.
-- **Hybrid retrieval (BM25 + dense)** for queries with literal entity matches (driver names, circuit names, exact phrases). Dense embedding alone fumbles literal matches sometimes.
-- **Metadata-aware retrieval** — extract entities (year, race, driver) from the question with a tiny LLM call, then pre-filter Chroma `where={...}` before scoring. Especially helps year-drift problems.
-- **2026+ races as the season progresses.** The scraper is idempotent; an incremental rebuild is a few minutes per session.
-- **FIA stewards' decisions corpus** — a separate document type for race-incident penalties, queryable alongside Wikipedia narrative. Would let the bot answer "why was Verstappen penalised at race X" with a source that's actually authoritative.
-- **Multi-turn conversation memory** in the Streamlit UI — currently each turn is independent.
-- **Streamlit UI toggle for agentic mode** — the eval harness exposes it; the UI doesn't yet.
-
----
-
 ## Run it yourself
 
 ```bash
@@ -182,31 +168,6 @@ ollama pull llama3.2:3b
 # Set in .env: LLM_PROVIDER=ollama
 uv run streamlit run app/streamlit_app.py
 ```
-
----
-
-## Deploying to Streamlit Community Cloud
-
-1. Push the repo to GitHub (the pre-built `chroma_db/` directory must be committed so the cloud instance doesn't try to rebuild on cold start).
-2. Go to [share.streamlit.io](https://share.streamlit.io) and click **New app**.
-3. Configure:
-   - **Repository:** `<your-github>/f1-rag`
-   - **Branch:** `main`
-   - **Main file path:** `app/streamlit_app.py`
-   - **Python version:** 3.11 (set via the dropdown or `runtime.txt`)
-4. Click **Advanced settings** → **Secrets** and paste:
-   ```toml
-   GROQ_API_KEY = "gsk_your_key_here"
-   ```
-5. Click **Deploy**.
-
-**Cold-start expectations:** first boot downloads `sentence-transformers` + `torch` + the BGE-small model (~700 MB), which takes 1–2 minutes. Subsequent users hit a warm instance and see <1s first-token latency. After ~20 min of inactivity Streamlit Cloud puts the app to sleep; the next visitor pays the cold-start tax once.
-
-**Memory footprint:** ~700–900 MB at steady state. Tight on the 1 GB free tier but works in practice. If you ever switch to BGE-base (~440 MB model), measure carefully — it's likely too much for the free tier.
-
-**Rate limits:** Groq's free tier is 100K tokens/day for Llama 3.3 70B. At portfolio traffic that's plenty; for a viral moment, upgrade to Groq Dev tier or rotate to a paid Anthropic key (set `ANTHROPIC_API_KEY` and `LLM_PROVIDER=anthropic`).
-
----
 
 ## Tech stack
 
